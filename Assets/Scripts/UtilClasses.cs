@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace UtilClasses
 {
@@ -21,7 +23,13 @@ namespace UtilClasses
         public static List<Dictionary<string, object>> Read(string file)
         {
             var list = new List<Dictionary<string, object>>();
-            TextAsset data = Resources.Load(file) as TextAsset;
+            TextAsset data = null;
+            Addressables.LoadAssetAsync<TextAsset>(file).Completed +=
+                (AsyncOperationHandle<TextAsset> obj) =>
+                {
+                    AsyncOperationHandle handle = obj;
+                    data = obj.Result;
+                };
 
             var lines = Regex.Split(data.text, LINE_SPLIT_RE);
 

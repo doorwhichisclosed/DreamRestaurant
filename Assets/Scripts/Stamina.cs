@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -9,7 +10,7 @@ public class Stamina : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timerText;
     public int maxStamina = 25;
     public int currentStamina;
-    private int restoreDuration = 5;
+    private int restoreDuration = 100;
     private DateTime nextStaminaTime;
     private DateTime lastStaminaTime;
     private bool isRestoring = false;
@@ -17,19 +18,19 @@ public class Stamina : MonoBehaviour
 
     async void Start()
     {
+        await RenewCachedTime();
+        TimerInternal().Forget();
         if (!ES3.KeyExists("CurrentStamina"))
         {
             ES3.Save("CurrentStamina", 25);
             Load().Forget();
-            RestoreStamina().Forget();
+            StartCoroutine(RestoreStamina());
         }
         else
         {
             Load().Forget();
-            RestoreStamina().Forget();
+            StartCoroutine(RestoreStamina());
         }
-        cachedTime = await WebTime();
-        await TimerInternal();
     }
     private async UniTask TimerInternal()
     {
@@ -43,18 +44,20 @@ public class Stamina : MonoBehaviour
     /// <summary>
     /// 스태미나 사용 관련
     /// </summary>
-    public async void UseStamina()
+    public void UseStamina()
     {
         if (currentStamina >= 1)
         {
             currentStamina--;
             UpdateStamina();
-
-            if (currentStamina + 1 == maxStamina)
+            if (!isRestoring)
             {
-                nextStaminaTime = AddDuration(await WebTime(), restoreDuration);
+                if (currentStamina + 1 == maxStamina)
+                {
+                    nextStaminaTime = AddDuration(cachedTime, restoreDuration);
+                }
+                StartCoroutine(RestoreStamina());
             }
-            RestoreStamina().Forget();
         }
 
         else
@@ -67,20 +70,20 @@ public class Stamina : MonoBehaviour
     /// 추후에 고쳐야함
     /// </summary>
     /// <returns></returns>
-    private async UniTask RestoreStamina()
+    private IEnumerator RestoreStamina()
     {
         UpdateStaminaTimer();
         isRestoring = true;
         while (currentStamina < maxStamina)
         {
+            DateTime currentDateTime = cachedTime;
             DateTime nextDateTime = nextStaminaTime;
-            bool isEnergyAdding = false;
-
-            while (cachedTime > nextDateTime)
+            bool isStaminaAdding = false;
+            while (currentDateTime > nextDateTime)
             {
                 if (currentStamina < maxStamina)
                 {
-                    isEnergyAdding = true;
+                    isStaminaAdding = true;
                     currentStamina++;
                     UpdateStamina();
                     DateTime timeToAdd = lastStaminaTime > nextDateTime ? lastStaminaTime : nextDateTime;
@@ -89,14 +92,15 @@ public class Stamina : MonoBehaviour
                 else
                     break;
             }
-            if (isEnergyAdding)
+            if (isStaminaAdding)
             {
                 lastStaminaTime = cachedTime;
                 nextStaminaTime = nextDateTime;
             }
-            UpdateStamina();
             UpdateStaminaTimer();
+            UpdateStamina();
             Save();
+            yield return null;
         }
         isRestoring = false;
     }
@@ -177,5 +181,13 @@ public class Stamina : MonoBehaviour
                 return dateTime;
             }
         }
+    }
+    /// <summary>
+    /// 필요할 때만 갱신
+    /// </summary>
+    /// <returns></returns>
+    public async UniTask RenewCachedTime()
+    {
+        cachedTime = await WebTime();
     }
 }

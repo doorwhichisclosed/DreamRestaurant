@@ -25,11 +25,6 @@ public class IngredientManager : MonoBehaviour
     private List<Ingredient> curCheeses;
     private List<Ingredient> curSauces;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        OpenStore();
-    }
     /// <summary>
     /// 상점을 연다. 이때, json파일로부터 모든 음식 정보를 읽어온다.
     /// 상태 이상을 추후에 추가한다.

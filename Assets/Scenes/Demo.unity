@@ -815,7 +815,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5044b96338644e2429c290c262400e9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stamina: {fileID: 312352753}
+  stamina: {fileID: 38487078}
   mainGameObject: {fileID: 496834598}
   endOfGameObject: {fileID: 2049815505}
   gameTime: 20
@@ -3000,6 +3000,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -3645,7 +3646,6 @@ GameObject:
   - component: {fileID: 312352750}
   - component: {fileID: 312352752}
   - component: {fileID: 312352751}
-  - component: {fileID: 312352753}
   m_Layer: 0
   m_Name: StamainaText
   m_TagString: Untagged
@@ -3770,22 +3770,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 312352749}
   m_CullTransparentMesh: 1
---- !u!114 &312352753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 312352749}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 876a049bf75204a4ca88c58942d2dfe2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  staminaText: {fileID: 312352751}
-  timerText: {fileID: 1387705075}
-  maxStamina: 25
-  currentStamina: 0
 --- !u!1 &313065162
 GameObject:
   m_ObjectHideFlags: 0

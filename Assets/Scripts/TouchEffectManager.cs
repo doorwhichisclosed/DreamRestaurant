@@ -4,6 +4,8 @@ public class TouchEffectManager : BasePool<TouchEffect>
 {
     float spawnTime;
     public float defaultTime = 0.05f;
+    public GameObject effectContainer;
+    public RectTransform parentCanvas;
 
     void Update()
     {
@@ -20,9 +22,10 @@ public class TouchEffectManager : BasePool<TouchEffect>
     }
     protected override void OnGet(TouchEffect poolingObject)
     {
-        Vector3 mPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        poolingObject.transform.SetParent(effectContainer.transform);
+        Vector3 mPosition = Input.mousePosition;
         mPosition.z = 0;
-        poolingObject.transform.localPosition = mPosition;
+        poolingObject.transform.position = mPosition;
         poolingObject.InitTouchEffect();
         base.OnGet(poolingObject);
     }

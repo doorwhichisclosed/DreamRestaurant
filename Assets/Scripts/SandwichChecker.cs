@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SandwichChecker : MonoBehaviour
 {
@@ -9,8 +10,8 @@ public class SandwichChecker : MonoBehaviour
     [SerializeField] private TextMeshProUGUI mainText;
     [SerializeField] private TextMeshProUGUI cheeseText;
     [SerializeField] private TextMeshProUGUI sauceText;
-    [SerializeField] private GameObject ClickGetOrderButton;
-    public OrderRecipe orderRecipe;
+    [SerializeField] private GameStoreManager storeManager;
+    [SerializeField] UnityEvent OnSandwichFinished;
     /// <summary>
     /// 주어진 오더와 만들어진 샌드위치를 비교해준다.
     /// </summary>
@@ -39,62 +40,45 @@ public class SandwichChecker : MonoBehaviour
         }
         cheeseText.text = sb.ToString();
         sb.Clear();
-        foreach (Ingredient i in sandwichResult.sauces)
-        {
-            sb.Append(i.IngredientName);
-            if (i == sandwichResult.sauces[sandwichResult.sauces.Count - 1])
-                break;
-            sb.Append(", ");
-        }
-        sauceText.text = sb.ToString();
+        sauceText.text = sandwichResult.sauces.IngredientName;
         sb.Clear();
         float result = 0;
-        if (sandwichResult.bread.IngredientName != orderRecipe.order.preferBread)
+        if (sandwichResult.bread.IngredientName != storeManager.Order.preferBread)
         {
             result -= 1;
         }
         foreach (Ingredient i in sandwichResult.vegetables)
         {
-            if (orderRecipe.order.unlikeVegetables.Contains(i.IngredientName))
+            if (storeManager.Order.preferVegetables.Contains(i.IngredientName))
             {
-                result -= 0.5f;
+                result += 0.5f;
             }
         }
-        if (sandwichResult.main.IngredientName != orderRecipe.order.preferMain)
+        if (sandwichResult.main.IngredientName != storeManager.Order.preferMain)
         {
             result -= 1;
         }
         int cheeseCheck = 2;
         foreach (Ingredient i in sandwichResult.cheeses)
         {
-            if (orderRecipe.order.preferCheeses.Contains(i.IngredientName))
+            if (storeManager.Order.preferCheeses.Contains(i.IngredientName))
                 cheeseCheck--;
             else
                 cheeseCheck++;
         }
         result -= 0.5f * cheeseCheck;
         float sauceCheck = 0f;
-        foreach (Ingredient i in sandwichResult.sauces)
+        if (sandwichResult.sauces.ParentEmotion == storeManager.Order.preferParentEmotion)
         {
-            if (orderRecipe.order.preferParentEmotion.Contains(i.ParentEmotion))
-            {
-                sauceCheck += 1f;
-            }
-            else
-            {
-                sauceCheck -= 0.5f;
-            }
-        }
-        if (sauceCheck == orderRecipe.order.preferParentEmotion.Count)
-        {
-            sauceCheck += 1f;
+            sauceCheck += 1;
         }
         else
         {
-            sauceCheck -= 1f;
+            sauceCheck -= 1;
         }
-        result += 0.5f * sauceCheck;
+
+        result += sauceCheck * 2;
         Debug.Log(result);
-        ClickGetOrderButton.SetActive(true);
+        OnSandwichFinished?.Invoke();
     }
 }

@@ -20,12 +20,14 @@ MonoBehaviour:
   - m_GUID: 1287eb008d11f1c448f479e9d2f9ffa2
     m_Address: OrderSentences
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - default
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bbdda858033c17342b77746b7a0a7c73
     m_Address: TestDialogue
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - default
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 568be4d3b3f17c64ea998f651b29fa99, type: 2}

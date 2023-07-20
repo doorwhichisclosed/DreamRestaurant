@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,26 +15,31 @@ public class IngredientManager : MonoBehaviour
     public List<Ingredient> sauceIngredients;
 
     [SerializeField] private GameObject ingredientSelectCanvas;
-    [SerializeField] private ToggleGroup ingredientSelectToggleGroup;
-    [SerializeField] private List<Toggle> tempToggles;
-    [SerializeField] private Button nextButton;
-    [SerializeField] private SandwichChecker sandwichMaker;
+    [SerializeField] private List<Button> tempButtons;
+    [SerializeField] private SandwichChecker sandwichChecker;
 
     private Ingredient curBread;
     private List<Ingredient> curVegetables;
     private Ingredient curMain;
     private List<Ingredient> curCheeses;
-    private List<Ingredient> curSauces;
+    private Ingredient curSauce;
+    private int vegetableNum = 0;
+    private int cheeseNum = 0;
 
     /// <summary>
     /// 상점을 연다. 이때, json파일로부터 모든 음식 정보를 읽어온다.
     /// 상태 이상을 추후에 추가한다.
     /// </summary>
-    public void OpenStore()
+    public void PrepareIngredients()
     {
+        baseIngredients = new List<BaseIngredient>();
+        breadIngredients.Clear();
+        vegetableIngredients.Clear();
+        mainIngredients.Clear();
+        cheeseIngredients.Clear();
+        sauceIngredients.Clear();
         if (File.Exists(Application.persistentDataPath + "/" + "BaseIngredients"))
         {
-            baseIngredients = new List<BaseIngredient>();
             string jsonFile = File.ReadAllText(Application.persistentDataPath + "/" + "BaseIngredients");
             baseIngredients = JsonUtility.FromJson<UtilClasses.SerializationList<BaseIngredient>>(jsonFile).ToList();
         }
@@ -81,194 +87,138 @@ public class IngredientManager : MonoBehaviour
     private void SelectBread()
     {
         Debug.Log("bread");
-        nextButton.onClick.RemoveAllListeners();
-        foreach (Toggle toggle in tempToggles)
+        foreach (Button button in tempButtons)
         {
-            toggle.gameObject.SetActive(false);
+            button.gameObject.SetActive(false);
         }
-        ingredientSelectToggleGroup.enabled = true;
         for (int i = 0; i < breadIngredients.Count; i++)
         {
-            Toggle temp = tempToggles[i];
-            temp.onValueChanged.RemoveAllListeners();
-            temp.isOn = false;
-            temp.GetComponentInChildren<Text>().text = breadIngredients[i].IngredientName;
+            Button temp = tempButtons[i];
+            temp.onClick.RemoveAllListeners();
+            temp.GetComponentInChildren<TextMeshProUGUI>().text
+                = breadIngredients[i].IngredientName;
             temp.gameObject.SetActive(true);
             int x = i;
-            temp.onValueChanged.AddListener((bool isOn) =>
+            temp.onClick.AddListener(() =>
             {
-                if (isOn)
-                {
-                    curBread = breadIngredients[x];
-                }
+                curBread = breadIngredients[x];
+                SelectVegetable();
             });
         }
-        nextButton.onClick.AddListener(() => { if (ingredientSelectToggleGroup.AnyTogglesOn()) SelectVegetable(); });
     }
 
     private void SelectVegetable()
     {
+        vegetableNum = 0;
         Debug.Log("vegetable");
         List<Ingredient> tempCurVegetables = new List<Ingredient>();
         curVegetables = new List<Ingredient>();
-        nextButton.onClick.RemoveAllListeners();
-        foreach (Toggle toggle in tempToggles)
+        foreach (Button button in tempButtons)
         {
-            toggle.gameObject.SetActive(false);
+            button.gameObject.SetActive(false);
         }
-        ingredientSelectToggleGroup.enabled = false;
         for (int i = 0; i < vegetableIngredients.Count; i++)
         {
-            Toggle temp = tempToggles[i];
-            temp.onValueChanged.RemoveAllListeners();
-            temp.isOn = false;
-            temp.GetComponentInChildren<Text>().text = vegetableIngredients[i].IngredientName;
+            Button temp = tempButtons[i];
+            temp.onClick.RemoveAllListeners();
+            temp.GetComponentInChildren<TextMeshProUGUI>().text
+                = vegetableIngredients[i].IngredientName;
             temp.gameObject.SetActive(true);
             int x = i;
-            temp.onValueChanged.AddListener((bool isOn) =>
+            temp.onClick.AddListener(() =>
             {
-                if (isOn)
+
+                tempCurVegetables.Add(vegetableIngredients[x]);
+                vegetableNum++;
+                if (vegetableNum == 3)
                 {
-                    tempCurVegetables.Add(vegetableIngredients[x]);
+                    SelectMain();
                 }
                 else
-                {
-                    if (tempCurVegetables.Contains(vegetableIngredients[x]))
-                    {
-                        tempCurVegetables.Remove(vegetableIngredients[x]);
-                    }
-                }
+                    temp.gameObject.SetActive(false);
             });
         }
-        nextButton.onClick.AddListener(() =>
-        {
-            if (tempCurVegetables.Count > 0)
-            {
-                foreach (Ingredient i in tempCurVegetables)
-                {
-                    curVegetables.Add(i);
-                }
-                SelectMain();
-            }
-        });
     }
 
     private void SelectMain()
     {
         Debug.Log("main");
-        nextButton.onClick.RemoveAllListeners();
-        foreach (Toggle toggle in tempToggles)
+        foreach (Button button in tempButtons)
         {
-            toggle.gameObject.SetActive(false);
+            button.gameObject.SetActive(false);
         }
-        ingredientSelectToggleGroup.enabled = true;
         for (int i = 0; i < mainIngredients.Count; i++)
         {
-            Toggle temp = tempToggles[i];
-            temp.onValueChanged.RemoveAllListeners();
-            temp.isOn = false;
-            temp.GetComponentInChildren<Text>().text = mainIngredients[i].IngredientName;
+            Button temp = tempButtons[i];
+            temp.onClick.RemoveAllListeners();
+            temp.GetComponentInChildren<TextMeshProUGUI>().text
+                = mainIngredients[i].IngredientName;
             temp.gameObject.SetActive(true);
             int x = i;
-            temp.onValueChanged.AddListener((bool isOn) =>
+            temp.onClick.AddListener(() =>
             {
-                if (isOn)
-                {
-                    curMain = mainIngredients[x];
-                }
+
+                curMain = mainIngredients[x];
+                SelectCheese();
             });
         }
-        nextButton.onClick.AddListener(() => { if (ingredientSelectToggleGroup.AnyTogglesOn()) SelectCheese(); });
     }
 
     private void SelectCheese()
     {
+        cheeseNum = 0;
         Debug.Log("cheese");
         List<Ingredient> tempCurCheeses = new List<Ingredient>();
         curCheeses = new List<Ingredient>();
-        nextButton.onClick.RemoveAllListeners();
-        foreach (Toggle toggle in tempToggles)
+        foreach (Button button in tempButtons)
         {
-            toggle.gameObject.SetActive(false);
+            button.gameObject.SetActive(false);
         }
-        ingredientSelectToggleGroup.enabled = false;
         for (int i = 0; i < cheeseIngredients.Count; i++)
         {
-            Toggle temp = tempToggles[i];
-            temp.onValueChanged.RemoveAllListeners();
-            temp.isOn = false;
-            temp.GetComponentInChildren<Text>().text = cheeseIngredients[i].IngredientName;
+            Button temp = tempButtons[i];
+            temp.onClick.RemoveAllListeners();
+            temp.GetComponentInChildren<TextMeshProUGUI>().text
+                = cheeseIngredients[i].IngredientName;
             temp.gameObject.SetActive(true);
             int x = i;
-            temp.onValueChanged.AddListener((bool isOn) =>
+            temp.onClick.AddListener(() =>
             {
-                if (isOn)
+                tempCurCheeses.Add(cheeseIngredients[x]);
+                cheeseNum++;
+                if (cheeseNum == 2)
                 {
-                    tempCurCheeses.Add(cheeseIngredients[x]);
+                    SelectSauce();
                 }
                 else
-                {
-                    if (tempCurCheeses.Contains(cheeseIngredients[x]))
-                        tempCurCheeses.Add(cheeseIngredients[x]);
-                }
+                    temp.gameObject.SetActive(false);
             });
         }
-        nextButton.onClick.AddListener(() =>
-        {
-            if (tempCurCheeses.Count > 0)
-            {
-                foreach (Ingredient i in tempCurCheeses)
-                {
-                    curCheeses.Add(i);
-                }
-                SelectSauce();
-            }
-        });
     }
 
     private void SelectSauce()
     {
         Debug.Log("sauce");
         List<Ingredient> tempCurSauces = new List<Ingredient>();
-        curSauces = new List<Ingredient>();
-        nextButton.onClick.RemoveAllListeners();
-        foreach (Toggle toggle in tempToggles)
+        foreach (Button button in tempButtons)
         {
-            toggle.gameObject.SetActive(false);
+            button.gameObject.SetActive(false);
         }
-        ingredientSelectToggleGroup.enabled = false;
         for (int i = 0; i < sauceIngredients.Count; i++)
         {
-            Toggle temp = tempToggles[i];
-            temp.onValueChanged.RemoveAllListeners();
-            temp.isOn = false;
-            temp.GetComponentInChildren<Text>().text = sauceIngredients[i].IngredientName;
+            Button temp = tempButtons[i];
+            temp.onClick.RemoveAllListeners();
+            temp.GetComponentInChildren<TextMeshProUGUI>().text
+                = sauceIngredients[i].IngredientName;
             temp.gameObject.SetActive(true);
             int x = i;
-            temp.onValueChanged.AddListener((bool isOn) =>
+            temp.onClick.AddListener(() =>
             {
-                if (isOn)
-                {
-                    tempCurSauces.Add(sauceIngredients[x]);
-                }
-                else
-                {
-                    if (tempCurSauces.Contains(sauceIngredients[x]))
-                        tempCurSauces.Remove(sauceIngredients[x]);
-                }
+
+                curSauce = sauceIngredients[x];
+                sandwichChecker.CheckSandwich(FinishSandwich());
             });
         }
-        nextButton.onClick.AddListener(() =>
-        {
-            if (tempCurSauces.Count > 0)
-            {
-                foreach (Ingredient i in tempCurSauces)
-                {
-                    curSauces.Add(i);
-                }
-                sandwichMaker.CheckSandwich(FinishSandwich());
-            }
-        });
     }
     /// <summary>
     /// 샌드위치를 만들고 return해준다. 이는 SandwichMaker+SandwichChecker(추후에 합칩)에서 평가한다.
@@ -276,7 +226,7 @@ public class IngredientManager : MonoBehaviour
     /// <returns></returns>
     public Sandwich FinishSandwich()
     {
-        Sandwich sandwich = new Sandwich(curBread, curVegetables, curMain, curCheeses, curSauces);
+        Sandwich sandwich = new Sandwich(curBread, curVegetables, curMain, curCheeses, curSauce);
         ingredientSelectCanvas.SetActive(false);
         return sandwich;
     }

@@ -86,17 +86,17 @@ public class Order
 {
     public string preferMain;
     public string preferBread;
-    public List<string> unlikeVegetables;
+    public List<string> preferVegetables;
     public List<string> preferCheeses;
-    public List<ParentEmotion> preferParentEmotion;
-    public List<string> preferEmotion;
+    public ParentEmotion preferParentEmotion;
+    public string preferEmotion;
 
     public Order(string _preferMain, string _preferBread, List<string> _unlikeVegetables,
-        List<string> _preferCheeses, List<ParentEmotion> _preferParentEmotion, List<string> _preferEmotion)
+        List<string> _preferCheeses, ParentEmotion _preferParentEmotion, string _preferEmotion)
     {
         this.preferMain = _preferMain;
         this.preferBread = _preferBread;
-        unlikeVegetables = _unlikeVegetables;
+        preferVegetables = _unlikeVegetables;
         preferCheeses = _preferCheeses;
         preferParentEmotion = _preferParentEmotion;
         preferEmotion = _preferEmotion;
@@ -109,15 +109,36 @@ public class Sandwich
     public List<Ingredient> vegetables;
     public Ingredient main;
     public List<Ingredient> cheeses;
-    public List<Ingredient> sauces;
+    public Ingredient sauces;
 
     public Sandwich(Ingredient _bread, List<Ingredient> _vegetables, Ingredient _main,
-        List<Ingredient> _cheeses, List<Ingredient> _sauces)
+        List<Ingredient> _cheeses, Ingredient _sauces)
     {
         bread = _bread;
         vegetables = _vegetables;
         main = _main;
         cheeses = _cheeses;
         sauces = _sauces;
+    }
+}
+
+[System.Serializable]
+public class PlayerData
+{
+    public int playTimeLevel;
+    public int foodEfficiencyLevel;
+    public int foodCostLevel;
+    public int moneyNum;
+    public int realMoneyNum;
+    public int curStoryNum;
+
+    public PlayerData()
+    {
+        playTimeLevel = 0;
+        foodEfficiencyLevel = 0;
+        foodCostLevel = 0;
+        moneyNum = 0;
+        realMoneyNum = 0;
+        curStoryNum = 0;
     }
 }

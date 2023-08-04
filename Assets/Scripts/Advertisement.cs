@@ -1,91 +1,160 @@
+using GoogleMobileAds.Api;
+using GoogleMobileAds.Api.AdManager;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class Advertisement : MonoBehaviour
+public class Advertisement : Singleton<Advertisement>
 {
-    public string androidGameID;
-    public string iosGameID;
-
-    public bool isTestingMode = true;
-    string gameID;
-
-    private void Init()
-    {
-#if UNITY_ANDROID
-        gameID = androidGameID;
-#elif UNITY_IPHONE
-        gameID = iosGameID;
-#else
-        gameID="unexpected_playform";
-#endif
-        IronSource.Agent.validateIntegration();
-        Debug.Log("unity-script: unity version" + IronSource.unityVersion());
-
-        // SDK init
-        Debug.Log("unity-script: IronSource.Agent.init");
-        IronSource.Agent.init(androidGameID);
-    }
+    private string testRewardAdKey = "ca-app-pub-3940256099942544/5224354917";
+    public GameObject AdLoadedStatus;
+    protected Advertisement() {  }
     private void Start()
     {
-        Init();
+        MobileAds.RaiseAdEventsOnUnityMainThread = true;
+        MobileAds.Initialize(initStatus => { });
+        LoadRewardedAd();
     }
-    private void OnEnable()
-    {
-        IronSourceRewardedVideoEvents.onAdOpenedEvent += RewardedVideoOnAdOpenedEvent;
-        IronSourceRewardedVideoEvents.onAdClosedEvent += RewardedVideoOnAdClosedEvent;
-        IronSourceRewardedVideoEvents.onAdAvailableEvent += RewardedVideoOnAdAvailable;
-        IronSourceRewardedVideoEvents.onAdUnavailableEvent += RewardedVideoOnAdUnavailable;
-        IronSourceRewardedVideoEvents.onAdShowFailedEvent += RewardedVideoOnAdShowFailedEvent;
-        IronSourceRewardedVideoEvents.onAdRewardedEvent += RewardedVideoOnAdRewardedEvent;
-        IronSourceRewardedVideoEvents.onAdClickedEvent += RewardedVideoOnAdClickedEvent;
-    }
+    private RewardedAd _rewardedAd;
 
-    /************* RewardedVideo AdInfo Delegates *************/
-    // Indicates that there¡¯s an available ad.
-    // The adInfo object includes information about the ad that was loaded successfully
-    // This replaces the RewardedVideoAvailabilityChangedEvent(true) event
-    void RewardedVideoOnAdAvailable(IronSourceAdInfo adInfo)
+    /// <summary>
+    /// Loads the ad.
+    /// </summary>
+    public void LoadRewardedAd()
     {
-    }
-    // Indicates that no ads are available to be displayed
-    // This replaces the RewardedVideoAvailabilityChangedEvent(false) event
-    void RewardedVideoOnAdUnavailable()
-    {
-    }
-    // The Rewarded Video ad view has opened. Your activity will loose focus.
-    void RewardedVideoOnAdOpenedEvent(IronSourceAdInfo adInfo)
-    {
-    }
-    // The Rewarded Video ad view is about to be closed. Your activity will regain its focus.
-    void RewardedVideoOnAdClosedEvent(IronSourceAdInfo adInfo)
-    {
-    }
-    // The user completed to watch the video, and should be rewarded.
-    // The placement parameter will include the reward data.
-    // When using server-to-server callbacks, you may ignore this event and wait for the ironSource server callback.
-    void RewardedVideoOnAdRewardedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo)
-    {
-        Debug.Log("Success");
-    }
-    // The rewarded video ad was failed to show.
-    void RewardedVideoOnAdShowFailedEvent(IronSourceError error, IronSourceAdInfo adInfo)
-    {
-    }
-    // Invoked when the video ad was clicked.
-    // This callback is not supported by all networks, and we recommend using it only if
-    // it¡¯s supported by all networks you included in your build.
-    void RewardedVideoOnAdClickedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo)
-    {
-    }
-
-    public void OnClickedRewardButton()
-    {
-        if (IronSource.Agent.isRewardedVideoAvailable())
+        // Clean up the old ad before loading a new one.
+        if (_rewardedAd != null)
         {
-            IronSource.Agent.showRewardedVideo();
+            DestroyAd();
+        }
+
+        Debug.Log("Loading rewarded ad.");
+
+        // Create our request used to load the ad.
+        var adRequest = new AdRequest();
+
+        // Send the request to load the ad.
+        RewardedAd.Load(testRewardAdKey, adRequest, (RewardedAd ad, LoadAdError error) =>
+        {
+            // If the operation failed with a reason.
+            if (error != null)
+            {
+                Debug.LogError("Rewarded ad failed to load an ad with error : " + error);
+                return;
+            }
+            // If the operation failed for unknown reasons.
+            // This is an unexpected error, please report this bug if it happens.
+            if (ad == null)
+            {
+                Debug.LogError("Unexpected error: Rewarded load event fired with null ad and null error.");
+                return;
+            }
+
+            // The operation completed successfully.
+            Debug.Log("Rewarded ad loaded with response : " + ad.GetResponseInfo());
+            _rewardedAd = ad;
+
+            // Register to ad events to extend functionality.
+            RegisterEventHandlers(ad);
+
+            // Inform the UI that the ad is ready.
+            AdLoadedStatus?.SetActive(true);
+        });
+    }
+
+    /// <summary>
+    /// Shows the ad.
+    /// </summary>
+    public void ShowAd()
+    {
+        if (_rewardedAd != null && _rewardedAd.CanShowAd())
+        {
+            Debug.Log("Showing rewarded ad.");
+            _rewardedAd.Show((Reward reward) =>
+            {
+                Debug.Log(String.Format("Rewarded ad granted a reward: {0} {1}",
+                                        reward.Amount,
+                                        reward.Type));
+            });
         }
         else
         {
-            Debug.Log("Can't open reward");
+            Debug.LogError("Rewarded ad is not ready yet.");
         }
+
+        // Inform the UI that the ad is not ready.
+        AdLoadedStatus?.SetActive(false);
+    }
+
+    /// <summary>
+    /// Destroys the ad.
+    /// </summary>
+    public void DestroyAd()
+    {
+        if (_rewardedAd != null)
+        {
+            Debug.Log("Destroying rewarded ad.");
+            _rewardedAd.Destroy();
+            _rewardedAd = null;
+        }
+
+        // Inform the UI that the ad is not ready.
+        AdLoadedStatus?.SetActive(false);
+    }
+
+    /// <summary>
+    /// Logs the ResponseInfo.
+    /// </summary>
+    public void LogResponseInfo()
+    {
+        if (_rewardedAd != null)
+        {
+            var responseInfo = _rewardedAd.GetResponseInfo();
+            UnityEngine.Debug.Log(responseInfo);
+        }
+    }
+
+    private void RegisterEventHandlers(RewardedAd ad)
+    {
+        // Raised when the ad is estimated to have earned money.
+        ad.OnAdPaid += (AdValue adValue) =>
+        {
+            Debug.Log(String.Format("Rewarded ad paid {0} {1}.",
+                adValue.Value,
+                adValue.CurrencyCode));
+        };
+        // Raised when an impression is recorded for an ad.
+        ad.OnAdImpressionRecorded += () =>
+        {
+            Debug.Log("Rewarded ad recorded an impression.");
+        };
+        // Raised when a click is recorded for an ad.
+        ad.OnAdClicked += () =>
+        {
+            Debug.Log("Rewarded ad was clicked.");
+        };
+        // Raised when the ad opened full screen content.
+        ad.OnAdFullScreenContentOpened += () =>
+        {
+            Debug.Log("Rewarded ad full screen content opened.");
+        };
+        // Raised when the ad closed full screen content.
+        ad.OnAdFullScreenContentClosed += () =>
+        {
+            Debug.Log("Rewarded Ad full screen content closed.");
+
+            // Reload the ad so that we can show another as soon as possible.
+            LoadRewardedAd();
+        };
+        // Raised when the ad failed to open full screen content.
+        ad.OnAdFullScreenContentFailed += (AdError error) =>
+        {
+            Debug.LogError("Rewarded ad failed to open full screen content " +
+                           "with error : " + error);
+
+            // Reload the ad so that we can show another as soon as possible.
+            LoadRewardedAd();
+        };
     }
 }

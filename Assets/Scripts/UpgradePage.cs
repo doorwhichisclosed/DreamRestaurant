@@ -1,11 +1,13 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UpgradePage : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI playTimeLevelText;
     [SerializeField] private TextMeshProUGUI foodEfficiencyLevelText;
     [SerializeField] private TextMeshProUGUI foodCostLevelText;
+    [SerializeField] private Button rewardButton;
 
     private void Start()
     {
@@ -13,6 +15,8 @@ public class UpgradePage : MonoBehaviour
         UpgradeText("PlayTime");
         UpgradeText("FoodEfficiency");
         UpgradeText("FoodCost");
+        rewardButton.onClick.RemoveAllListeners();
+        rewardButton.onClick.AddListener(() => Advertisement.Instance.ShowAd());
     }
     public void UpgradeStat(string key)
     {

@@ -8907,6 +8907,37 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &357202965
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 357202966}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &357202966
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 357202965}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.0064766407, z: -9.6999}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &369237650
 GameObject:
   m_ObjectHideFlags: 0
@@ -10750,9 +10781,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbeba35f10c276b4c8cd2fde3860c000, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  androidGameID: 1afb71abd
-  iosGameID: 
-  isTestingMode: 1
 --- !u!1 &526865299
 GameObject:
   m_ObjectHideFlags: 0
@@ -11433,7 +11461,6 @@ GameObject:
   m_Component:
   - component: {fileID: 582780130}
   - component: {fileID: 582780131}
-  - component: {fileID: 582780132}
   m_Layer: 5
   m_Name: Upper
   m_TagString: Untagged
@@ -11489,21 +11516,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &582780132
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 582780129}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5eea49d9a926b9d4693fbca005e825e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playTimeLevelText: {fileID: 735222145}
-  foodEfficiencyLevelText: {fileID: 105980303}
-  foodCostLevelText: {fileID: 573683885}
 --- !u!1 &588284503
 GameObject:
   m_ObjectHideFlags: 0
@@ -15817,6 +15829,7 @@ GameObject:
   - component: {fileID: 1000963168}
   - component: {fileID: 1000963170}
   - component: {fileID: 1000963169}
+  - component: {fileID: 1000963171}
   m_Layer: 5
   m_Name: Store
   m_TagString: Untagged
@@ -15882,6 +15895,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000963167}
   m_CullTransparentMesh: 1
+--- !u!114 &1000963171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000963167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5eea49d9a926b9d4693fbca005e825e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playTimeLevelText: {fileID: 735222145}
+  foodEfficiencyLevelText: {fileID: 105980303}
+  foodCostLevelText: {fileID: 573683885}
+  rewardButton: {fileID: 543176845}
 --- !u!1 &1009182112
 GameObject:
   m_ObjectHideFlags: 0
@@ -18052,18 +18081,8 @@ MonoBehaviour:
   OnSandwichFinished:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2061559976}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: SetCustomer
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      - {m_Target: {fileID: 2061559976}, m_TargetAssemblyTypeName: GameManager, Assembly-CSharp, m_MethodName: SetCustomer, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
+    m_CallsDirty: 1
 --- !u!114 &1215058417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19265,7 +19284,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 582780132}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UpgradePage, Assembly-CSharp
         m_MethodName: UpgradeStat
         m_Mode: 5
@@ -19747,7 +19766,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 582780132}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UpgradePage, Assembly-CSharp
         m_MethodName: UpgradeStat
         m_Mode: 5
@@ -22338,7 +22357,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 582780132}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UpgradePage, Assembly-CSharp
         m_MethodName: UpgradeStat
         m_Mode: 5
@@ -24931,6 +24950,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1800558191}
   m_CullTransparentMesh: 1
+--- !u!1 &1811732065
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1811732067}
+  - component: {fileID: 1811732066}
+  m_Layer: 0
+  m_Name: Admanager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1811732066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811732065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bb70b4e670c72d4dad9f67a1f77ae77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AdLoadedStatus: {fileID: 357202965}
+--- !u!4 &1811732067
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811732065}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1823101053
 GameObject:
   m_ObjectHideFlags: 0
@@ -25476,8 +25540,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dacf465d65210e14f8f882f31a9187de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emotions: []
-  ingredientManager: {fileID: 1903426434}
   orderText: {fileID: 148631268}
   orderPage: {fileID: 765208526}
 --- !u!114 &1903426434
@@ -25492,6 +25554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 362b5eed0f2dca4469746fce33574b1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseIngredients: []
   breadIngredients: []
   vegetableIngredients: []
   mainIngredients: []
@@ -25521,6 +25584,25 @@ MonoBehaviour:
   - {fileID: 73088308}
   - {fileID: 869570385}
   sandwichChecker: {fileID: 1215058416}
+  curBread:
+    ingredientName: 
+    parentEmotion: 0
+    dreamCost: 0
+    ingredinetCategory: 0
+  curVegetables: []
+  curMain:
+    ingredientName: 
+    parentEmotion: 0
+    dreamCost: 0
+    ingredinetCategory: 0
+  curCheeses: []
+  curSauce:
+    ingredientName: 
+    parentEmotion: 0
+    dreamCost: 0
+    ingredinetCategory: 0
+  vegetableNum: 0
+  cheeseNum: 0
 --- !u!1 &1922998673
 GameObject:
   m_ObjectHideFlags: 0
@@ -27381,7 +27463,6 @@ MonoBehaviour:
   fireflyParticle: {fileID: 345980814}
   swipeUI: {fileID: 196542932}
   customerImage: {fileID: 293203078}
-  sandwichChecker: {fileID: 1215058416}
   gameStoreManager: {fileID: 1903426433}
 --- !u!4 &2061559977
 Transform:
@@ -28263,3 +28344,5 @@ SceneRoots:
   - {fileID: 743510304}
   - {fileID: 908429174}
   - {fileID: 2061559977}
+  - {fileID: 1811732067}
+  - {fileID: 357202966}

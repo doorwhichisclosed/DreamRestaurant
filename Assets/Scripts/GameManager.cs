@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -10,8 +11,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SwipeUI swipeUI;
     private int enablePerson;
     [SerializeField] private Button customerImage;
-    [SerializeField] private SandwichChecker sandwichChecker;
     [SerializeField] private GameStoreManager gameStoreManager;
+    [SerializeField] private List<Ingredient> ingredients;
     private int curPerson = 0;
     /// <summary>
     /// 게임 매니저로 씬 변경없이 UI변경으로 게임 시작
@@ -21,7 +22,6 @@ public class GameManager : MonoBehaviour
         stamina.UseStamina();
         fireflyParticle.SetActive(false);
         mainGameObject.SetActive(true);
-        mainGameObject.GetComponent<IngredientManager>().PrepareIngredients();
         swipeUI.enabled = false;
         enablePerson = Mathf.FloorToInt(5f * Mathf.Pow(1.05f,
             PlayerDataContainer.Instance.playerData.playTimeLevel));
@@ -47,7 +47,6 @@ public class GameManager : MonoBehaviour
             (() =>
             {
                 curPerson++;
-                gameStoreManager.SetOrder();
                 customerImage.gameObject.SetActive(false);
 
             });

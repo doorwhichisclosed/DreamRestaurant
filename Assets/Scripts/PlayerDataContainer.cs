@@ -1,6 +1,11 @@
+using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
+
+
 public class PlayerDataContainer
 {
     public PlayerData playerData;
+    public List<Ingredient> ingredients;
     private static PlayerDataContainer instance;
     public static PlayerDataContainer Instance
     {
@@ -19,9 +24,22 @@ public class PlayerDataContainer
         LoadPlayerData();
     }
 
-    public void LoadPlayerData()
+    public async void LoadPlayerData()
     {
         playerData = ES3.Load("PlayerData", new PlayerData()) as PlayerData;
+        if (ingredients == null)
+        {
+            ingredients= new List<Ingredient>();
+            List<Dictionary<string, object>> ingredientsData = new List<Dictionary<string, object>>();
+            ingredientsData = await UtilClasses.CSVReader.Read("Ingredients");
+            foreach (var data in ingredientsData)
+            {
+                Ingredient ingredient = new Ingredient((string)data["Name"], (string)data["Description"], (string)data["Category"], ((int)data["Cost"]),
+                    ((int)data["Condition"]));
+                ingredients.Add(ingredient);
+            }
+            UnityEngine.Debug.Log(ingredients.Count);
+        }
     }
 
     public void SavePlayerData()

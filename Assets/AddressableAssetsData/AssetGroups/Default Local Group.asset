@@ -29,6 +29,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - default
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 492c418c4ba475c46b53bd0612652228
+    m_Address: Ingredients
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 568be4d3b3f17c64ea998f651b29fa99, type: 2}
   m_SchemaSet:

@@ -8,9 +8,9 @@ public class Stamina : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI staminaText;
     [SerializeField] private TextMeshProUGUI timerText;
-    public int maxStamina = 25;
+    public int maxStamina = 5;
     public int currentStamina;
-    private int restoreDuration = 100;
+    private int restoreDuration = 600;
     private DateTime nextStaminaTime;
     private DateTime lastStaminaTime;
     private bool isRestoring = false;
@@ -22,7 +22,7 @@ public class Stamina : MonoBehaviour
         TimerInternal().Forget();
         if (!ES3.KeyExists("CurrentStamina"))
         {
-            ES3.Save("CurrentStamina", 25);
+            ES3.Save("CurrentStamina", 5);
             Load().Forget();
             StartCoroutine(RestoreStamina());
         }
@@ -46,6 +46,10 @@ public class Stamina : MonoBehaviour
     /// </summary>
     public void UseStamina()
     {
+        if(currentStamina>5)
+        {
+            currentStamina = 5;
+        }
         if (currentStamina >= 1)
         {
             currentStamina--;

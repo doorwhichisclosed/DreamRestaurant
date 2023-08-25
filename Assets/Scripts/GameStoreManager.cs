@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using TMPro;
+using UnityEngine.AddressableAssets;
 using UnityEngine;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
+using System.Collections;
 
 public class GameStoreManager : MonoBehaviour
 {
@@ -10,13 +13,12 @@ public class GameStoreManager : MonoBehaviour
     [SerializeField] private GameObject endOfGameObject;
     [SerializeField] private GameObject fireflyParticle;
     [SerializeField] private SwipeUI swipeUI;
-    private int enablePerson;
-    [SerializeField] private Button customerImage;
+    [SerializeField] private Customer customerImage;
     public TextMeshProUGUI orderText;
     public GameObject orderPage;
     public Button orderPageButton;
     public GameObject SelectFoodPage;
-    public List<Button> foodButtons;
+    public List<GameObject> foodObject;
     private List<Dictionary<string, object>> orderSentences;
     [SerializeField] private List<Ingredient> breadIngredient;
     private List<Ingredient> vegetableIngredient;
@@ -25,8 +27,9 @@ public class GameStoreManager : MonoBehaviour
     private List<Ingredient> sauceIngredient;
     private Sandwich sandwichOrder;
     private Sandwich sandwichResult;
-    private int curPerson = 0;
-    public async void Init()
+    public TextMeshProUGUI sauceText;
+    public Plate plate;
+    public async UniTask Init()
     {
         if (orderSentences == null)
         {
@@ -64,23 +67,18 @@ public class GameStoreManager : MonoBehaviour
                 }
             }
         }
-    }
-    public void OnClickedCustomer()
-    {
-        customerImage.gameObject.SetActive(false);
-        curPerson++;
-        MakeOrder();
-        orderPage.SetActive(true);
-        string temp = (string)orderSentences[0]["Sentences"];
-        temp = temp.Replace("{Main}", sandwichOrder.Main.IngredientName);
-        temp = temp.Replace("{Bread}",sandwichOrder.Bread.IngredientName);
-        temp = temp.Replace("{Cheese}",sandwichOrder.Cheese.IngredientName);
-        temp = temp.Replace("{Vegetable}",sandwichOrder.Vegetable.IngredientName);
-        temp = temp.Replace("{Emotion}", sandwichOrder.Sauce.Emotion.ToString());
-        orderText.text = temp;
-        orderPageButton.onClick.AddListener(() => {
-            SelectBread();
-            orderPage.SetActive(false); });
+        List<int> elist = new List<int>();
+        for (int i = 1; i < 9; i++)
+        {
+            elist.Add(i);
+        }
+        foreach(var e in sauceIngredient)
+        {
+            int rand = elist[Random.Range(0, elist.Count)];
+            e.SelectEmotion(rand);
+            elist.Remove(rand);
+        }
+        sauceText.text=string.Format("{0}: {1}\n{2}: {3}\n{4}: {5}\n{6}: {7}\n{8}: {9}\n{10}: {11}\n{12}: {13}\n{14}: {15}", sauceIngredient[0].IngredientName, sauceIngredient[0].Emotion.ToString(), sauceIngredient[1].IngredientName, sauceIngredient[1].Emotion.ToString(), sauceIngredient[2].IngredientName, sauceIngredient[2].Emotion.ToString(), sauceIngredient[3].IngredientName, sauceIngredient[3].Emotion.ToString(), sauceIngredient[4].IngredientName, sauceIngredient[4].Emotion.ToString(), sauceIngredient[5].IngredientName, sauceIngredient[5].Emotion.ToString(), sauceIngredient[6].IngredientName, sauceIngredient[6].Emotion.ToString(), sauceIngredient[7].IngredientName, sauceIngredient[7].Emotion.ToString());
     }
     public void MakeOrder()
     {
@@ -93,138 +91,206 @@ public class GameStoreManager : MonoBehaviour
         int cheeseRandNum;
         cheeseRandNum = Random.Range(0, cheeseIngredient.Count);
         int sauceRandNum;
-        sauceRandNum = Random.Range(1, 9);
+        sauceRandNum = Random.Range(0, 8);
         sandwichOrder = new Sandwich(breadIngredient[breadRandNum], vegetableIngredient[vegeRandNum],
             mainIngredient[mainRandNum], cheeseIngredient[cheeseRandNum], sauceIngredient[sauceRandNum]);
     }
-    private void SelectBread()
+    private void SelectBreadPhase()
     {
         SelectFoodPage.SetActive(true);
         sandwichResult = new Sandwich();
-        foreach(var button in foodButtons)
+        foreach(var food in foodObject)
         {
-            button.onClick.RemoveAllListeners();
-            button.gameObject.SetActive(false);
+            food.GetComponentInChildren<Image>().sprite = null;
+            food.SetActive(false);
         }
         for(int i=0;i<breadIngredient.Count;i++)
         {
             int x = i;
-            foodButtons[x].gameObject.SetActive(true);
-            foodButtons[x].onClick.AddListener(() =>
-            {
-                sandwichResult.SetBread(breadIngredient[x]);
-                SelectMain();
-            }
-            );
+            foodObject[x].gameObject.SetActive(true);
+            foodObject[x].GetComponentInChildren<DragNDropFood>().SetIngredient(breadIngredient[x]);
+            foodObject[x].GetComponentInChildren<Image>().sprite=
+                PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
+            Debug.Log(foodObject[x].GetComponentInChildren<Image>().sprite);
         }
+        plate.OnDropIngredient.RemoveAllListeners();
+        plate.OnDropIngredient.AddListener(i => SelectBread(i));
     }
-    private void SelectMain()
+    private void SelectMainPhase()
     {
-        foreach (var button in foodButtons)
+        foreach (var food in foodObject)
         {
-            button.onClick.RemoveAllListeners();
-            button.gameObject.SetActive(false);
+            food.GetComponentInChildren<Image>().sprite = null;
+            food.SetActive(false);
         }
         for (int i = 0; i < mainIngredient.Count; i++)
         {
             int x = i;
-            foodButtons[x].gameObject.SetActive(true);
-            foodButtons[x].onClick.AddListener(() => {
-                sandwichResult.SetMain(mainIngredient[x]);
-                SelectCheese();
-            });
+            foodObject[x].gameObject.SetActive(true);
+            foodObject[x].GetComponentInChildren<DragNDropFood>().SetIngredient(mainIngredient[x]);
+            Debug.Log(PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName]);
+            foodObject[x].GetComponentInChildren<Image>().sprite = PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
         }
+        plate.OnDropIngredient.RemoveAllListeners();
+        plate.OnDropIngredient.AddListener(i=>SelectMain(i));
     }
-    private void SelectCheese()
+    private void SelectVegetablePhase()
     {
-        foreach (var button in foodButtons)
+        foreach (var food in foodObject)
         {
-            button.onClick.RemoveAllListeners();
-            button.gameObject.SetActive(false);
-        }
-        for (int i = 0; i < cheeseIngredient.Count; i++)
-        {
-            int x = i;
-            foodButtons[x].gameObject.SetActive(true);
-            foodButtons[x].onClick.AddListener(() => {
-                sandwichResult.SetCheese(cheeseIngredient[x]);
-                SelectVegetable();
-            });
-        }
-    }
-    private void SelectVegetable()
-    {
-        foreach (var button in foodButtons)
-        {
-            button.onClick.RemoveAllListeners();
-            button.gameObject.SetActive(false);
+            food.GetComponentInChildren<Image>().sprite = null;
+            food.SetActive(false);
         }
         for (int i = 0; i < vegetableIngredient.Count; i++)
         {
             int x = i;
-            foodButtons[x].gameObject.SetActive(true);
-            foodButtons[x].onClick.AddListener(() => {
-                sandwichResult.SetVegetable(vegetableIngredient[x]);
-                SelectSauce();
-            });
+            foodObject[x].gameObject.SetActive(true);
+            foodObject[x].GetComponentInChildren<DragNDropFood>().SetIngredient(vegetableIngredient[x]);
+            foodObject[x].GetComponentInChildren<Image>().sprite = PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
         }
+        plate.OnDropIngredient.RemoveAllListeners();
+        plate.OnDropIngredient.AddListener(i => SelectVegetable(i));
     }
-    private void SelectSauce()
+    private void SelectCheesePhase()
     {
-        foreach (var button in foodButtons)
+        foreach (var food in foodObject)
         {
-            button.onClick.RemoveAllListeners();
-            button.gameObject.SetActive(false);
+            food.GetComponentInChildren<Image>().sprite = null;
+            food.SetActive(false);
+        }
+        for (int i = 0; i < cheeseIngredient.Count; i++)
+        {
+            int x = i;
+            foodObject[x].gameObject.SetActive(true);
+            foodObject[x].GetComponentInChildren<DragNDropFood>().SetIngredient(cheeseIngredient[x]);
+            foodObject[x].GetComponentInChildren<Image>().sprite = PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
+        }
+        plate.OnDropIngredient.RemoveAllListeners();
+        plate.OnDropIngredient.AddListener(i => SelectCheese(i));
+    }
+    private void SelectSaucePhase()
+    {
+        foreach (var food in foodObject)
+        {
+            food.GetComponentInChildren<Image>().sprite = null;
+            food.SetActive(false);
         }
         for (int i = 0; i < sauceIngredient.Count; i++)
         {
             int x = i;
-            foodButtons[x].gameObject.SetActive(true);
-            foodButtons[x].onClick.AddListener(() => {
-                sandwichResult.SetSauce(sauceIngredient[x]);
-                SetCustomer();
-                SelectFoodPage.SetActive(false);
-            });
+            foodObject[x].SetActive(true);
+            foodObject[x].GetComponentInChildren<DragNDropFood>().SetIngredient(sauceIngredient[x]);
+            foodObject[x].GetComponentInChildren<Image>().sprite = PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
         }
+        plate.OnDropIngredient.RemoveAllListeners();
+        plate.OnDropIngredient.AddListener(i => SelectSauce(i));
+    }
+    public void SelectBread(Ingredient ingredient)
+    {
+        sandwichResult.SetBread(ingredient);
+        SelectMainPhase();
+    }
+    public void SelectMain(Ingredient ingredient)
+    {
+        sandwichResult.SetMain(ingredient);
+        SelectVegetablePhase();
+    }
+    public void SelectVegetable(Ingredient ingredient)
+    {
+        sandwichResult.SetVegetable(ingredient);
+        SelectCheesePhase();
+    }
+    public void SelectCheese(Ingredient ingredient)
+    {
+        sandwichResult.SetCheese(ingredient);
+        SelectSaucePhase();
+    }
+
+    public void SelectSauce(Ingredient ingredient)
+    {
+        sandwichResult.SetSauce(ingredient);
+        CheckSandwich();
+        foreach (var food in foodObject)
+        {
+            food.SetActive(false);
+        }
+        customerImage.gameObject.SetActive(true);
+    }
+    public void CheckSandwich()
+    {
+        if(!sandwichOrder.Bread.Equals(sandwichResult.Bread)
+            ||!sandwichOrder.Main.Equals(sandwichResult.Main)
+            ||!sandwichOrder.Vegetable.Equals(sandwichResult.Vegetable)
+            ||!sandwichOrder.Cheese.Equals(sandwichResult.Cheese)
+            ||!sandwichOrder.Sauce.Equals(sandwichOrder.Sauce)
+            ) 
+        {
+            Debug.Log("틀림");
+        }
+        else
+        {
+            Debug.Log("맞음");
+            PlayerDataContainer.Instance.ChangeValue("Money",(int)(50*(1+0.1f*PlayerDataContainer.Instance.playerData.curStoryNum)),true);
+        }
+        SetCustomer();
     }
     /// <summary>
     /// 게임 매니저로 씬 변경없이 UI변경으로 게임 시작
     /// </summary>
-    public void StartGame()
+    public async void StartGame()
     {
+        if (stamina.currentStamina < 1)
+            return;
         stamina.UseStamina();
         fireflyParticle.SetActive(false);
         mainGameObject.SetActive(true);
-        Init();
         swipeUI.enabled = false;
-        enablePerson = Mathf.FloorToInt(5f * Mathf.Pow(1.05f,
-            PlayerDataContainer.Instance.playerData.playTimeLevel));
+        StartCoroutine(EndCoroutine());
+        await Init();
         SetCustomer();
     }
     public void EndGame()
     {
-        curPerson = 0;
-        mainGameObject.SetActive(false);
-        swipeUI.enabled = true;
-        fireflyParticle?.SetActive(true);
+        
+        endOfGameObject.SetActive(true);
+        endOfGameObject.GetComponent<Button>().onClick.RemoveAllListeners();
+        endOfGameObject.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            mainGameObject.SetActive(false);
+            fireflyParticle?.SetActive(true);
+            swipeUI.enabled = true;
+            endOfGameObject.SetActive(false);
+            endOfGameObject.GetComponent<Button>().onClick.RemoveAllListeners();
+        });
+        
     }
     public void SetCustomer()
     {
-        customerImage.onClick.RemoveAllListeners();
-        if (curPerson == enablePerson)
-        {
-            EndGame();
-            return;
-        }
-        customerImage.onClick.AddListener
+        MakeOrder();
+        orderPage.SetActive(true);
+        string temp = (string)orderSentences[0]["Sentences"];
+        temp = temp.Replace("{Main}", sandwichOrder.Main.IngredientName);
+        temp = temp.Replace("{Bread}", sandwichOrder.Bread.IngredientName);
+        temp = temp.Replace("{Cheese}", sandwichOrder.Cheese.IngredientName);
+        temp = temp.Replace("{Vegetable}", sandwichOrder.Vegetable.IngredientName);
+        temp = temp.Replace("{Emotion}", sandwichOrder.Sauce.Emotion.ToString());
+        orderText.text = string.Format("메인: {0}\n빵: {1}\n치즈: {2}\n채소: {3}\n감정: {4}", sandwichOrder.Main.IngredientName, sandwichOrder.Bread.IngredientName, sandwichOrder.Cheese.IngredientName, sandwichOrder.Vegetable.IngredientName, sandwichOrder.Sauce.Emotion.ToString());
+        customerImage.SetCustomer();
+        customerImage.GetComponent<Button>().onClick.RemoveAllListeners();
+        customerImage.GetComponent<Button>().onClick.AddListener
             (() =>
             {
-                OnClickedCustomer();
+                SelectBreadPhase();
+                orderPage.SetActive(false);
             });
-        customerImage.gameObject.SetActive(true);
     }
     private void OnApplicationQuit()
     {
         PlayerDataContainer.Instance.SavePlayerData();
+    }
+    IEnumerator EndCoroutine()
+    {
+        yield return new WaitForSeconds(60);
+        EndGame();
     }
 }

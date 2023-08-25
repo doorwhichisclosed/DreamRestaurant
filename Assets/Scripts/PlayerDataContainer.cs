@@ -1,11 +1,15 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-
+using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class PlayerDataContainer
 {
     public PlayerData playerData;
     public List<Ingredient> ingredients;
+    private Dictionary<string, Sprite> ingredientsIcon;
+    public Dictionary<string, Sprite> IngredientsIcon { get { return ingredientsIcon; } }
     private static PlayerDataContainer instance;
     public static PlayerDataContainer Instance
     {
@@ -19,14 +23,14 @@ public class PlayerDataContainer
         }
     }
 
-    public PlayerDataContainer()
+    public async UniTask LoadPlayerData()
     {
-        LoadPlayerData();
-    }
-
-    public async void LoadPlayerData()
-    {
-        playerData = ES3.Load("PlayerData", new PlayerData()) as PlayerData;
+       
+        //if(ES3.KeyExists("PlayerData"))
+        //    playerData = ES3.Load("PlayerData") as PlayerData;
+        //if(null == playerData)
+        //    playerData= new PlayerData();
+        playerData = new PlayerData();
         if (ingredients == null)
         {
             ingredients= new List<Ingredient>();
@@ -35,8 +39,16 @@ public class PlayerDataContainer
             foreach (var data in ingredientsData)
             {
                 Ingredient ingredient = new Ingredient((string)data["Name"], (string)data["Description"], (string)data["Category"], ((int)data["Cost"]),
-                    ((int)data["Condition"]));
+                    ((int)data["Condition"]), (string)data["Address"]);
                 ingredients.Add(ingredient);
+            }
+            ingredientsIcon = new Dictionary<string, Sprite>();
+            foreach(var i in ingredients)
+            {
+                UniTask<Sprite> asycSprite
+                    =Addressables.LoadAssetAsync<Sprite>(i.IngredientAddress).Task.AsUniTask<Sprite>();
+                Sprite sprite=await asycSprite;
+                ingredientsIcon.Add(i.IngredientName, sprite);
             }
             UnityEngine.Debug.Log(ingredients.Count);
         }
@@ -61,7 +73,10 @@ public class PlayerDataContainer
                 playerData.foodCostLevel += value;
                 break;
             case "Money":
+                if (playerData.moneyNum + value < 0)
+                    return;
                 playerData.moneyNum += value;
+                GameObject.FindObjectOfType<Coin>().SetCoinText(PlayerDataContainer.instance.playerData.moneyNum);
                 break;
             case "RealMoney":
                 playerData.realMoneyNum += value;
@@ -76,10 +91,10 @@ public class PlayerDataContainer
         }
     }
 
-    public void InitStat()
+    public async void InitStat()
     {
         playerData = new PlayerData();
         SavePlayerData();
-        LoadPlayerData();
+        await LoadPlayerData();
     }
 }

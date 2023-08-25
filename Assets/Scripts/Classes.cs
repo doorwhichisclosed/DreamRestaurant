@@ -61,10 +61,12 @@ public class Ingredient
     private int cost;
     public int Cost { get { return cost; } }
     private int condition;
-    public int Condition { get { return condition; } } 
+    public int Condition { get { return condition; } }
+    private string ingredientAddress;
+    public string IngredientAddress { get { return ingredientAddress; } }
 
     public Ingredient(string _ingredientName, string _ingredintDescription,
-        string _ingredientCategory, int _cost,int _condition)
+        string _ingredientCategory, int _cost,int _condition,string _ingredientAddress)
     {
         ingredientName = _ingredientName;
         ingredientDescription = _ingredintDescription;
@@ -72,6 +74,7 @@ public class Ingredient
         ingredientCategory=(IngredientCategory)Enum.Parse(typeof(IngredientCategory), _ingredientCategory);
         cost = _cost;
         condition=_condition;
+        ingredientAddress = _ingredientAddress;
     }
     public void SelectEmotion(int emotionNum)
     {

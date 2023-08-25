@@ -6,32 +6,28 @@ using UnityEngine.UI;
 
 public class DragNDropFood : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDragHandler
 {
+    private Ingredient ingredient;
+    public RectTransform parentObject;
+    public Ingredient Ingredient { get { return ingredient; } }
+    public void SetIngredient(Ingredient _ingredient)
+    {
+        ingredient = _ingredient;
+    }
     public void OnBeginDrag(PointerEventData eventData)
     {
-        transform.position=eventData.position;
         GetComponent<Image>().raycastTarget = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        transform.position=eventData.position;
+        Vector2 mPosition;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(parentObject, eventData.position, Camera.main, out mPosition);
+        transform.localPosition = mPosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         transform.localPosition = Vector2.zero;
         GetComponent<Image>().raycastTarget=true;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

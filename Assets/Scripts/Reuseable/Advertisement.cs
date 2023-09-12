@@ -9,6 +9,7 @@ using UnityEngine.Events;
 public class Advertisement : Singleton<Advertisement>
 {
     private string testRewardAdKey = "ca-app-pub-3940256099942544/5224354917";
+    private string rewardAdKey = "ca-app-pub-7533257681368118/8191648618";
     public GameObject AdLoadedStatus;
     public UnityEvent OnAdRewardEvent;
     protected Advertisement() {  }
@@ -37,7 +38,7 @@ public class Advertisement : Singleton<Advertisement>
         var adRequest = new AdRequest();
 
         // Send the request to load the ad.
-        RewardedAd.Load(testRewardAdKey, adRequest, (RewardedAd ad, LoadAdError error) =>
+        RewardedAd.Load(rewardAdKey, adRequest, (RewardedAd ad, LoadAdError error) =>
         {
             // If the operation failed with a reason.
             if (error != null)

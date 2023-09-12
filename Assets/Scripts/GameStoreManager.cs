@@ -112,6 +112,7 @@ public class GameStoreManager : MonoBehaviour
             foodObject[x].GetComponentInChildren<Image>().sprite=
                 PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
             Debug.Log(foodObject[x].GetComponentInChildren<Image>().sprite);
+            foodObject[x].GetComponentInChildren<Image>().preserveAspect = true;
         }
         plate.OnDropIngredient.RemoveAllListeners();
         plate.OnDropIngredient.AddListener(i => SelectBread(i));
@@ -130,6 +131,7 @@ public class GameStoreManager : MonoBehaviour
             foodObject[x].GetComponentInChildren<DragNDropFood>().SetIngredient(mainIngredient[x]);
             Debug.Log(PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName]);
             foodObject[x].GetComponentInChildren<Image>().sprite = PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
+            foodObject[x].GetComponentInChildren<Image>().preserveAspect = true;
         }
         plate.OnDropIngredient.RemoveAllListeners();
         plate.OnDropIngredient.AddListener(i=>SelectMain(i));
@@ -147,6 +149,7 @@ public class GameStoreManager : MonoBehaviour
             foodObject[x].gameObject.SetActive(true);
             foodObject[x].GetComponentInChildren<DragNDropFood>().SetIngredient(vegetableIngredient[x]);
             foodObject[x].GetComponentInChildren<Image>().sprite = PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
+            foodObject[x].GetComponentInChildren<Image>().preserveAspect = true;
         }
         plate.OnDropIngredient.RemoveAllListeners();
         plate.OnDropIngredient.AddListener(i => SelectVegetable(i));
@@ -164,6 +167,7 @@ public class GameStoreManager : MonoBehaviour
             foodObject[x].gameObject.SetActive(true);
             foodObject[x].GetComponentInChildren<DragNDropFood>().SetIngredient(cheeseIngredient[x]);
             foodObject[x].GetComponentInChildren<Image>().sprite = PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
+            foodObject[x].GetComponentInChildren<Image>().preserveAspect = true;
         }
         plate.OnDropIngredient.RemoveAllListeners();
         plate.OnDropIngredient.AddListener(i => SelectCheese(i));
@@ -181,6 +185,7 @@ public class GameStoreManager : MonoBehaviour
             foodObject[x].SetActive(true);
             foodObject[x].GetComponentInChildren<DragNDropFood>().SetIngredient(sauceIngredient[x]);
             foodObject[x].GetComponentInChildren<Image>().sprite = PlayerDataContainer.Instance.IngredientsIcon[foodObject[x].GetComponentInChildren<DragNDropFood>().Ingredient.IngredientName];
+            foodObject[x].GetComponentInChildren<Image>().preserveAspect = true;
         }
         plate.OnDropIngredient.RemoveAllListeners();
         plate.OnDropIngredient.AddListener(i => SelectSauce(i));
@@ -248,6 +253,7 @@ public class GameStoreManager : MonoBehaviour
         StartCoroutine(EndCoroutine());
         await Init();
         SetCustomer();
+        FindAnyObjectByType<BGMPlayer>().PlayBGM(1);
     }
     public void EndGame()
     {
@@ -261,6 +267,7 @@ public class GameStoreManager : MonoBehaviour
             swipeUI.enabled = true;
             endOfGameObject.SetActive(false);
             endOfGameObject.GetComponent<Button>().onClick.RemoveAllListeners();
+            FindAnyObjectByType<BGMPlayer>().PlayBGM(0);
         });
         
     }

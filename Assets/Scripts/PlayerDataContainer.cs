@@ -25,12 +25,11 @@ public class PlayerDataContainer
 
     public async UniTask LoadPlayerData()
     {
-       
-        //if(ES3.KeyExists("PlayerData"))
-        //    playerData = ES3.Load("PlayerData") as PlayerData;
-        //if(null == playerData)
-        //    playerData= new PlayerData();
-        playerData = new PlayerData();
+
+        if (ES3.KeyExists("PlayerData"))
+            playerData = ES3.Load("PlayerData") as PlayerData;
+        if (null == playerData)
+            playerData = new PlayerData();
         if (ingredients == null)
         {
             ingredients= new List<Ingredient>();

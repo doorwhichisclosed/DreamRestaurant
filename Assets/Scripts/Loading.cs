@@ -23,5 +23,6 @@ public class Loading : MonoBehaviour
         gameObject.SetActive(false);
         afterLoading.SetActive(true);
         ingredientArchivePage.InitArchives();
+        FindAnyObjectByType<BGMPlayer>().PlayBGM(0);
     }
 }
